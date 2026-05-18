@@ -4,7 +4,7 @@
     "step": {
       "user": {
         "title": "CLAGE Homeserver Setup",
-        "description": "Wenn Du Hilfe bei der Konfiguration brauchst, dann siehe hier nach: https://github.com/klacol/homeassistant-clage_homeserver .",
+        "description": "Wenn Du Hilfe bei der Konfiguration brauchst, siehe die [Dokumentation]({docs_url}).",
         "data": {
           "name": "Der Name des Homeservers",
           "ipAddress": "Die IP-Adresse des Homeservers im lokalen Netzwerk (z.B. 192.168.9.65).",
