@@ -18,6 +18,7 @@ from .const import (
     CONF_HOMESERVER_IP_ADDRESS,
     CONF_HOMESERVER_ID,
     CONF_HEATER_ID,
+    CONF_PASSWORD,
     HOMESERVER_API,
 )
 
@@ -50,6 +51,7 @@ CONFIG_SCHEMA = vol.Schema(
                                         cv.string
                                     ),
                                     vol.Required(CONF_HEATER_ID): vol.All(cv.string),
+                                    vol.Required(CONF_PASSWORD): vol.All(cv.string),
                                 }
                             )
                         ],
@@ -76,6 +78,7 @@ async def async_setup_entry(hass, config):
         config.data[CONF_HOMESERVER_IP_ADDRESS],
         config.data[CONF_HOMESERVER_ID],
         config.data[CONF_HEATER_ID],
+        config.data[CONF_PASSWORD]
     )
     hass.data[DOMAIN]["api"][name] = clage_homeserver
 
@@ -168,13 +171,14 @@ async def async_setup(hass: core.HomeAssistant, config: dict) -> bool:
             ip_address = homeserver[0][CONF_HOMESERVER_IP_ADDRESS]
             homeserver_id = homeserver[0][CONF_HOMESERVER_ID]
             heater_id = homeserver[0][CONF_HEATER_ID]
+            password = homeserver[0][PASSWORD]
             _LOGGER.info(
                 "Setup: ip_address: '%s', homeserver_id: '%s', heater_id: '%s'",
                 ip_address,
                 homeserver_id,
                 heater_id,
             )
-            clage_home_server = ClageHomeServer(ip_address, homeserver_id, heater_id)
+            clage_home_server = ClageHomeServer(ip_address, homeserver_id, heater_id, password)
             homeserver_api[homeserver_name] = clage_home_server
 
     hass.data[DOMAIN]["api"] = homeserver_api

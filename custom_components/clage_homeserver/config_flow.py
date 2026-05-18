@@ -21,6 +21,7 @@ from .const import (
     CONF_HOMESERVER_ID,
     CONF_HEATER_ID,
     CONF_NAME,
+    CONF_PASSWORD,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -44,7 +45,7 @@ def clage_homeserver_entries(hass: HomeAssistant):
 class Clage_HomeserverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Config flow for clage_homeserver setup."""
 
-    VERSION = 1
+    VERSION = 2
 
     def __init__(self) -> None:
         """Initialize the config flow."""
@@ -62,12 +63,16 @@ class Clage_HomeserverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Return True if heater_id exists in configuration."""
         return heater_id in clage_homeserver_entries(self.hass)
 
+    def _password_in_configuration_exists(self, password: str) -> bool:
+    """Return True if password exists in configuration."""
+    return password in clage_homeserver_entries(self.hass)
+
     def _check_ip_address(
-        self, ip_address: str, homeserver_id: str, heater_id: str
+        self, ip_address: str, homeserver_id: str, heater_id: str, password: str,
     ) -> bool:
         """Check if we can connect to the soleredge api service."""
         api = clage_homeserver.ClageHomeServer(
-            ipAddress=ip_address, homeserverId=homeserver_id, heaterId=heater_id
+            ipAddress=ip_address, homeserverId=homeserver_id, heaterId=heater_id, password=password
         )
         try:
             response = api.requestStatus()
@@ -97,8 +102,9 @@ class Clage_HomeserverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 ip_address = user_input[CONF_HOMESERVER_IP_ADDRESS]
                 homeserver_id = user_input[CONF_HOMESERVER_ID]
                 heater_id = user_input[CONF_HEATER_ID]
+                password = user_input[CONF_PASSWORD]
                 can_connect = await self.hass.async_add_executor_job(
-                    self._check_ip_address, ip_address, homeserver_id, heater_id
+                    self._check_ip_address, ip_address, homeserver_id, heater_id, password
                 )
                 if can_connect:
                     return self.async_create_entry(
@@ -108,6 +114,7 @@ class Clage_HomeserverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                             CONF_HOMESERVER_IP_ADDRESS: ip_address,
                             CONF_HOMESERVER_ID: homeserver_id,
                             CONF_HEATER_ID: heater_id,
+                            CONF_PASSWORD: password
                         },
                     )
 
@@ -117,6 +124,7 @@ class Clage_HomeserverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 CONF_HOMESERVER_IP_ADDRESS: "",
                 CONF_HOMESERVER_ID: "",
                 CONF_HEATER_ID: "",
+                CONF_PASSWORD: "",
             }
         return self.async_show_form(
             step_id="user",
@@ -132,6 +140,9 @@ class Clage_HomeserverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     ): str,
                     vol.Required(
                         CONF_HEATER_ID, default=user_input[CONF_HEATER_ID]
+                    ): str,
+                    vol.Required(
+                        CONF_PASSWORD, default=user_input[CONF_PASSWORD]
                     ): str,
                 }
             ),
