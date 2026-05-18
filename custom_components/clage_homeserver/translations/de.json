@@ -27,6 +27,20 @@
       "invalid_ip": "Die IP Adresse ist ungültig."
     }
   },
+  "options": {
+    "step": {
+      "init": {
+        "title": "CLAGE Homeserver Optionen",
+        "description": "Verbindungseinstellungen des CLAGE Homeservers ändern.",
+        "data": {
+          "ipAddress": "IP-Adresse des Homeservers.",
+          "homeserverId": "Homeserver-ID.",
+          "heaterId": "Durchlauferhitzer-ID.",
+          "password": "App-Passwort."
+        }
+      }
+    }
+  },
   "component": {
     "clage_homeserver": {
       "set_temperature": {

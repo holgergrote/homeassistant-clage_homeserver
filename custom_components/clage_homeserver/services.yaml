@@ -4,14 +4,27 @@ set_temperature:
   fields:
     homeserver_name:
       name: "Homeserver name"
-      description: name of the homeserver
+      description: "The name you gave the homeserver during setup (slugified, e.g. 'dsx_server_ab7c')"
+      required: true
       example: "durchlauferhitzer_keller"
+      selector:
+        text:
     heater_id:
       name: "Heater ID"
-      description: id of the heater to update
+      description: "The device ID of the heater (e.g. '2049DB0CD7')"
+      required: true
       example: "2049DB0CD7"
+      selector:
+        text:
     temperature:
       name: "Temperature"
-      description: temperature to be set in °C (10-60)
-      example: "45"
+      description: "Target temperature in °C (10-60)"
+      required: true
+      example: 45
+      selector:
+        number:
+          min: 10
+          max: 60
+          step: 1
+          unit_of_measurement: "°C"
 

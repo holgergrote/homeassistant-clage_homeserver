@@ -9,13 +9,8 @@ Integration for Homeassistant to view and Control the Clage Homeserver for conti
 - Register in Home Assistant in the UI based configuration flow (no yaml)
 - Show sensor values from the heater
 - Change the water temperature of the heater
+- Change connection settings (IP address, password) after setup via Options
 - No cloud connection needed to control the heater - only local ip-access needed.
-
-# Warning: WIP - Work in progress
-This is an early version of the Integration (custom component).
-It uses the Python module [clage_homeserver](https://pypi.org/project/clage-homeserver/) to connect to the REST API of the heater.
-
-
 
 # Installation
 
@@ -35,49 +30,64 @@ git clone https://github.com/klacol/homeassistant-clage_homeserver.git
 # cp -r custom_components/clage_homeserver <your-ha-config-dir>/custom_components
 ```
 
-- Install the integration and use the config flow in the frontent
+- Restart Home Assistant
+- Go to Settings → Devices & Services → Add Integration → search for "CLAGE Homeserver"
 
-# Example Config
+# Configuration
 
-## `configuration.yaml`
+## Setup via UI
+
+1. Go to **Settings → Devices & Services → Add Integration**
+2. Search for **CLAGE Homeserver**
+3. Enter:
+   - **Name**: A name for your homeserver (e.g. `dsx_server_keller`)
+   - **IP Address**: The local IP of the homeserver (e.g. `192.168.0.78`)
+   - **Homeserver ID**: Found in CLAGE Smart-Control App under Settings/Devices/DSX Server/Server ID
+   - **Heater ID**: Found in CLAGE Smart-Control App under Settings/Devices/DSX Touch/Device ID
+   - **Password**: The app password (default: `smart`)
+
+## Changing Settings After Setup
+
+Go to **Settings → Devices & Services → CLAGE Homeserver → Configure** to change the IP address, IDs, or password without removing the integration.
+
+# Setting the Temperature
+
+## Via Developer Tools (Actions)
+
+1. Go to **Developer Tools → Actions**
+2. Search for `clage_homeserver.set_temperature`
+3. Fill in:
+   - **homeserver_name**: The name you gave during setup (slugified, e.g. `dsx_server_keller`)
+   - **heater_id**: Your heater device ID (e.g. `2016FFEE22`)
+   - **temperature**: Target temperature in °C (10-60)
+
+## Via Automation
+
+```yaml
+automation:
+  - alias: "Set water heater temperature from input"
+    trigger:
+      - platform: state
+        entity_id: input_number.clage_homeserver_temperature
+    action:
+      - action: clage_homeserver.set_temperature
+        data:
+          homeserver_name: "dsx_server_keller"
+          heater_id: "2016FFEE22"
+          temperature: "{{ states('input_number.clage_homeserver_temperature') | int }}"
+```
+
+### Helper for temperature slider
+
+Add this to your `configuration.yaml`:
 
 ```yaml
 input_number:
   clage_homeserver_temperature:
     name: Soll-Temperatur
-    min: 0
+    min: 10
     max: 60
     initial: 45
     step: 1
     unit_of_measurement: °C
-```
-
-## `automations.yaml`
-
-```yaml
-- id: '38237023328'
-  alias: 'clage_homeserver: set temperature based on input'
-  description: ''
-  trigger:
-  - entity_id: input_number.clage_homeserver_temperature
-    platform: state
-  condition: []
-  action:
-  - data_template:
-      homeserver_name: durchlauferhitzer_keller
-      heater_id: 2049DB0CD7
-      temperature: '{{ states(''input_number.clage_homeserver_temperature'') }}'
-    service: clage_homeserver.set_temperature
-- id: '38237023329'
-  alias: 'clage_homeserver: set temperature input based on heater'
-  description: ''
-  trigger:
-  - entity_id: sensor.clagehomeserver_durchlauferhitzer_keller_heater_status_setpoint
-    platform: state
-  condition: []
-  action:
-  - data_template:
-      entity_id: input_number.clage_homeserver_temperature
-      value: '{{ states.sensor.clagehomeserver_durchlauferhitzer_keller_heater_status_setpoint.state }}'
-    service: input_number.set_value
 ```

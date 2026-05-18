@@ -26,5 +26,19 @@
       "homeserver_not_active": "The Homeserver is not active.",
       "invalid_ip": "The IP Address is not valid."
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "CLAGE Homeserver Options",
+        "description": "Update the connection settings for the CLAGE Homeserver.",
+        "data": {
+          "ipAddress": "IP address of the Homeserver.",
+          "homeserverId": "Homeserver ID.",
+          "heaterId": "Heater ID.",
+          "password": "App password."
+        }
+      }
+    }
   }
 }

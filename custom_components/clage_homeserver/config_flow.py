@@ -51,6 +51,12 @@ class Clage_HomeserverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Initialize the config flow."""
         self._errors = {}
 
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry):
+        """Get the options flow for this handler."""
+        return ClageHomeserverOptionsFlowHandler(config_entry)
+
     def _ip_address_in_configuration_exists(self, ip_address: str) -> bool:
         """Return True if ip_address exists in configuration."""
         return ip_address in clage_homeserver_entries(self.hass)
@@ -147,4 +153,52 @@ class Clage_HomeserverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 }
             ),
             errors=self._errors,
+        )
+
+
+class ClageHomeserverOptionsFlowHandler(config_entries.OptionsFlow):
+    """Handle options flow for CLAGE Homeserver."""
+
+    def __init__(self, config_entry) -> None:
+        """Initialize options flow."""
+        self._config_entry = config_entry
+
+    async def async_step_init(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Manage the options."""
+        errors = {}
+
+        if user_input is not None:
+            # Update the config entry data with new values
+            new_data = {**self._config_entry.data, **user_input}
+            self.hass.config_entries.async_update_entry(
+                self._config_entry, data=new_data
+            )
+            await self.hass.config_entries.async_reload(self._config_entry.entry_id)
+            return self.async_create_entry(title="", data={})
+
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(
+                        CONF_HOMESERVER_IP_ADDRESS,
+                        default=self._config_entry.data.get(CONF_HOMESERVER_IP_ADDRESS, ""),
+                    ): str,
+                    vol.Required(
+                        CONF_HOMESERVER_ID,
+                        default=self._config_entry.data.get(CONF_HOMESERVER_ID, ""),
+                    ): str,
+                    vol.Required(
+                        CONF_HEATER_ID,
+                        default=self._config_entry.data.get(CONF_HEATER_ID, ""),
+                    ): str,
+                    vol.Required(
+                        CONF_PASSWORD,
+                        default=self._config_entry.data.get(CONF_PASSWORD, ""),
+                    ): str,
+                }
+            ),
+            errors=errors,
         )
