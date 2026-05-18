@@ -468,7 +468,6 @@ def _create_sensors_for_homeserver(
         _entities.append(
             ClageHomeserverSensor(
                 coordinator=hass.data[DOMAIN]["coordinator"],
-                entity_id=f"sensor.clagehomeserver_{homeserver_name}_{_sensor.system_name}",
                 homeserver_name=homeserver_name,
                 homeserver_ip_address=homeserver_ip_address,
                 homeserver_id=homeserver_id,
@@ -539,7 +538,6 @@ class ClageHomeserverSensor(CoordinatorEntity, SensorEntity):
     def __init__(
         self,
         coordinator,
-        entity_id,
         homeserver_name,
         homeserver_ip_address,
         homeserver_id,
@@ -558,7 +556,6 @@ class ClageHomeserverSensor(CoordinatorEntity, SensorEntity):
         self.homeserver_ip_address = homeserver_ip_address
         self.homeserver_id = homeserver_id
         self.heater_id = heater_id
-        self.entity_id = entity_id
         self._name = name
         self._attribute = attribute
         self._unit = unit
