@@ -64,8 +64,8 @@ class Clage_HomeserverConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return heater_id in clage_homeserver_entries(self.hass)
 
     def _password_in_configuration_exists(self, password: str) -> bool:
-    """Return True if password exists in configuration."""
-    return password in clage_homeserver_entries(self.hass)
+        """Return True if password exists in configuration."""
+        return password in clage_homeserver_entries(self.hass)
 
     def _check_ip_address(
         self, ip_address: str, homeserver_id: str, heater_id: str, password: str,
