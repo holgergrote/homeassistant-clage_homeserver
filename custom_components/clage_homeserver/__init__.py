@@ -237,13 +237,27 @@ async def async_setup(hass: core.HomeAssistant, config: dict) -> bool:
 
             try:
                 homeservers = hass.data[DOMAIN]["api"]
-                homeserver = homeservers[homeserver_name_input]
+                homeserver = homeservers.get(homeserver_name_input)
+                if homeserver is None:
+                    # Fallback: search by homeserverId or heaterId
+                    for api in homeservers.values():
+                        if api.homeserverId == homeserver_name_input or api.heaterId == heater_id_input:
+                            homeserver = api
+                            break
+                if homeserver is None:
+                    _LOGGER.error(
+                        "Homeserver '%s' / Heater '%s' not found! Available names: %s",
+                        homeserver_name_input,
+                        heater_id_input,
+                        list(homeservers.keys()),
+                    )
+                    return
                 await hass.async_add_executor_job(
                     homeserver.setTemperature,
                     temperature,
                 )
-            except KeyError:
-                _LOGGER.error("Heater with id '%s' not found!", heater_id_input)
+            except Exception as ex:
+                _LOGGER.error("Error setting temperature: %s", ex)
 
         await hass.data[DOMAIN]["coordinator"].async_refresh()
 

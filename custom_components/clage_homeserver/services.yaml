@@ -4,9 +4,9 @@ set_temperature:
   fields:
     homeserver_name:
       name: "Homeserver name"
-      description: "The name you gave the homeserver during setup (slugified, e.g. 'dsx_server_ab7c')"
+      description: "The name you gave the homeserver during setup (slugified) or the Homeserver ID (e.g. 'F8F005DB0CD7')"
       required: true
-      example: "durchlauferhitzer_keller"
+      example: "F8F005DB0CD7"
       selector:
         text:
     heater_id:
