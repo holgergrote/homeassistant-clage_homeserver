@@ -226,7 +226,7 @@ async def async_setup(hass: core.HomeAssistant, config: dict) -> bool:
         else:
             temperature = temperature_input
 
-        temperature = min(max(temperature, 10), 60)
+        temperature = min(max(temperature, 20), 60)
 
         if (len(heater_id_input) > 0) and len(heater_id_input) > 0:
             _LOGGER.debug(
@@ -239,7 +239,7 @@ async def async_setup(hass: core.HomeAssistant, config: dict) -> bool:
             try:
                 homeservers = hass.data[DOMAIN]["api"]
                 _LOGGER.info("Available homeservers in API dict: %s", list(homeservers.keys()))
-                homeserver = homeservers.get(homeserver_name_input)
+                homeserver = homeservers.get(homeserver_name_input) or homeservers.get(homeserver_name_input.lower())
                 if homeserver is None:
                     _LOGGER.info("Name '%s' not found, searching by homeserverId/heaterId...", homeserver_name_input)
                     # Fallback: search by homeserverId or heaterId

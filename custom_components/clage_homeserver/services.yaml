@@ -23,7 +23,7 @@ set_temperature:
       example: 45
       selector:
         number:
-          min: 10
+          min: 20
           max: 60
           step: 1
           unit_of_measurement: "°C"
