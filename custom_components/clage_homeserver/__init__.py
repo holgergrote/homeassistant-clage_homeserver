@@ -206,6 +206,7 @@ async def async_setup(hass: core.HomeAssistant, config: dict) -> bool:
 
     async def async_handle_set_temperature(call):
         """Handle the service call to set the temperature of the heater."""
+        _LOGGER.info("set_temperature service called with data: %s", dict(call.data))
         homeserver_name_input = call.data.get(SERVICE_HOMESERVE_NAME_ATTRIBUTE, "")
         heater_id_input = call.data.get(SERVICE_HEATER_ID_ATTRIBUTE, "")
         temperature_input = call.data.get(SERVICE_HEATER_TEMPERATURE, "")
@@ -237,10 +238,13 @@ async def async_setup(hass: core.HomeAssistant, config: dict) -> bool:
 
             try:
                 homeservers = hass.data[DOMAIN]["api"]
+                _LOGGER.info("Available homeservers in API dict: %s", list(homeservers.keys()))
                 homeserver = homeservers.get(homeserver_name_input)
                 if homeserver is None:
+                    _LOGGER.info("Name '%s' not found, searching by homeserverId/heaterId...", homeserver_name_input)
                     # Fallback: search by homeserverId or heaterId
                     for api in homeservers.values():
+                        _LOGGER.info("Checking API entry: homeserverId='%s', heaterId='%s'", api.homeserverId, api.heaterId)
                         if api.homeserverId == homeserver_name_input or api.heaterId == heater_id_input:
                             homeserver = api
                             break
@@ -252,10 +256,12 @@ async def async_setup(hass: core.HomeAssistant, config: dict) -> bool:
                         list(homeservers.keys()),
                     )
                     return
+                _LOGGER.info("Found homeserver, calling setTemperature(%s)", temperature)
                 await hass.async_add_executor_job(
                     homeserver.setTemperature,
                     temperature,
                 )
+                _LOGGER.info("setTemperature completed successfully")
             except Exception as ex:
                 _LOGGER.error("Error setting temperature: %s", ex)
 
